@@ -8,9 +8,17 @@ export default function Home() {
   const [error, setError] = useState('');
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [userNameDisplay, setUserNameDisplay] = useState('');
-  const [showToast, setShowToast] = useState(false);  // Controla a exibição do Toast
-  const [toastMessage, setToastMessage] = useState('');  // Mensagem a ser exibida
-  const [toastType, setToastType] = useState('');  // Tipo da mensagem (sucesso ou erro)
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('');
+  const [userProfile, setUserProfile] = useState(''); // Estado para o perfil do usuário
+  const menuOptions = {
+    A: [
+      "Exchange", "Bank", "City", "Class", "Country", "Customer",
+      "Identification", "Login", "Parameter", "PercentCheck", "Status", "StoreIP", "Report", "Logout"
+    ],
+    U: ["Exchange", "City", "Country", "Customer", "Logout"]
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -23,6 +31,7 @@ export default function Home() {
         setLoginSuccess(true);
         setError('');
         setUserNameDisplay(data.nome);
+        setUserProfile(data.perfil); // Define o perfil do usuário
         setToastMessage('Autenticação bem-sucedida!');
         setToastType('success');
       } else {
@@ -41,10 +50,8 @@ export default function Home() {
     }
 
     setShowToast(true);
-
-    // Remover o toast após 3 segundos
     setTimeout(() => {
-      setShowToast(true);
+      setShowToast(false); // Corrigido para ocultar o toast após 3 segundos
     }, 3000);
   };
 
@@ -57,9 +64,24 @@ export default function Home() {
       </Head>
 
       {/* Cabeçalho */}
-      <header className="fixed top-0 left-0 w-full bg-blue-600 text-white p-4 flex justify-between items-center z-10">
-        <h1 className="text-3xl font-bold">Luna Travel</h1>
-        {loginSuccess && <span className="text-lg">{userNameDisplay}</span>}
+      <header className="fixed top-0 left-0 w-full bg-blue-600 text-white p-4 flex items-center z-10">
+        <h1 className="text-3xl font-bold flex-1">Luna Travel</h1>
+        {loginSuccess && (
+          <div className="flex-1 flex justify-center">
+            {userProfile && (
+              <div className="bg-white text-black rounded-md shadow-md">
+                <ul className="flex space-x-4 p-4">
+                  {menuOptions[userProfile].map((item) => (
+                    <li key={item} className="cursor-pointer hover:bg-gray-200 px-3 py-2 rounded-md">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
+        <span className="flex-1 text-lg text-right">{loginSuccess ? userNameDisplay : ''}</span>
       </header>
 
       {/* Conteúdo principal */}
@@ -91,7 +113,6 @@ export default function Home() {
                 className="w-full mt-1 p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-            {error && <p className="text-red-500 text-center">{error}</p>}
             <button
               type="submit"
               className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -102,14 +123,13 @@ export default function Home() {
         </div>
       </main>
 
-    {showToast && (
-      <div className={`fixed top-20 right-5 px-4 py-2 rounded-lg text-white shadow-lg transition-opacity ease-in-out duration-1000
-        ${showToast ? 'opacity-100 visible' : 'opacity-0 invisible'} 
-        ${toastType === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
-        {toastMessage}
-      </div>
-    )}
-
+      {showToast && (
+        <div className={`fixed top-20 right-5 px-4 py-2 rounded-lg text-white shadow-lg transition-opacity ease-in-out duration-1000
+          ${showToast ? 'opacity-100 visible' : 'opacity-0 invisible'} 
+          ${toastType === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
+          {toastMessage}
+        </div>
+      )}
     </div>
   );
 }

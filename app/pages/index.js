@@ -1,6 +1,7 @@
 'use client';
 import Head from 'next/head';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation'; // Importa useRouter
 
 export default function Home() {
   const [username, setUsername] = useState('');
@@ -12,6 +13,8 @@ export default function Home() {
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('');
   const [userProfile, setUserProfile] = useState(''); // Estado para o perfil do usuário
+  const router = useRouter(); // Instancia o hook useRouter
+
   const menuOptions = {
     A: [
       "Exchange", "Bank", "City", "Class", "Country", "Customer",
@@ -55,6 +58,24 @@ export default function Home() {
     }, 3000);
   };
 
+  const handleMenuChange = (e) => {
+    const selectedOption = e.target.value;
+
+    if (selectedOption === "Logout") {
+      // Limpa o estado de autenticação
+      setLoginSuccess(false);
+      setUserNameDisplay('');
+      setUserProfile('');
+      setUsername('');
+      setPassword('');
+      setToastMessage('Logout realizado com sucesso!');
+      setToastType('success');
+      
+      // Redireciona o usuário para a página de login ou outra página
+      // router.push('/login'); // Altere para a rota que desejar
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <Head>
@@ -65,23 +86,26 @@ export default function Home() {
 
       {/* Cabeçalho */}
       <header className="fixed top-0 left-0 w-full bg-blue-600 text-white p-4 flex items-center z-10">
-        <h1 className="text-3xl font-bold flex-1">Luna Travel</h1>
-        {loginSuccess && (
+        <div className="flex items-center">
+          <h1 className="text-3xl font-bold flex-shrink-0">Luna Travel</h1>
+        </div>
+        {loginSuccess && userProfile && (
           <div className="flex-1 flex justify-center">
-            {userProfile && (
-              <div className="bg-white text-black rounded-md shadow-md">
-                <ul className="flex space-x-4 p-4">
-                  {menuOptions[userProfile].map((item) => (
-                    <li key={item} className="cursor-pointer hover:bg-gray-200 px-3 py-2 rounded-md">
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            <div className="bg-white text-black rounded-md shadow-md">
+              <select
+                className="bg-gray-100 text-black rounded-md p-2"
+                onChange={handleMenuChange} // Atualizado para usar handleMenuChange
+              >
+                {menuOptions[userProfile].map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         )}
-        <span className="flex-1 text-lg text-right">{loginSuccess ? userNameDisplay : ''}</span>
+        <span className="flex-shrink-0 text-lg text-right">{loginSuccess ? userNameDisplay : ''}</span>
       </header>
 
       {/* Conteúdo principal */}

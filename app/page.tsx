@@ -1,10 +1,10 @@
-// app/pages/dashboard.js
-import Login from '../app/pages/index'
+// app/page.
+import Login from "../app/pages/index.js"
 
-export default function DashboardPage() {
+export default function HomePage() {
   return (
-    <div>
-      <Login />
-    </div>
+      <div>
+        <Login/>
+      </div>
   );
 }

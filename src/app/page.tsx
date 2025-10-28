@@ -4,7 +4,7 @@ import { LoginForm } from "./_components/login-form"
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-8">
+      <div className="w-full max-w-md space-y-8 border-2 border-gray-300 rounded-xl p-6 shadow-lg bg-white">
         <div className="text-center">
           <h1 className="text-3xl font-bold">Login</h1>
           <p className="mt-2 text-sm text-muted-foreground">Entre com suas credenciais para acessar sua conta</p>
@@ -12,14 +12,14 @@ export default function Home() {
 
         <LoginForm />
 
-        <div className="text-center text-sm">
+        {/* <div className="text-center text-sm">
           <p>
             Não tem uma conta?{" "}
             <Link href="/signup" className="font-medium text-primary hover:underline">
               Cadastre-se
             </Link>
           </p>
-        </div>
+        </div> */}
       </div>
     </div>
   )

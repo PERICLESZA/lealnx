@@ -10,6 +10,7 @@ import { Eye, EyeOff, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { authClient } from "@/lib/auth-client"
 
 const signupSchema = z
   .object({
@@ -43,6 +44,23 @@ export function SignupForm() {
 
   async function onSubmit(formData: SignupFormValues) {
 
+    const {data, error} = await authClient.signUp.email({
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      callbackURL: "/dashboard"
+    },{
+      onRequest: (ctx) => {},
+
+      onSuccess: (ctx) => {
+        router.replace("/dashboard")
+      },
+
+      onError: (ctx) => {
+        console.log("Erro ao criar conta!")
+        console.log(ctx)
+      }
+    })
 
   }
 
@@ -149,7 +167,7 @@ export function SignupForm() {
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button type="submit" className="w-full bg-[#336699] hover:bg-[#4791C5]" disabled={isLoading}>
           {form.formState.isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -1,15 +1,422 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model account {
+  id                    String    @id
+  accountId             String    @db.Text
+  providerId            String    @db.Text
+  userId                String
+  accessToken           String?   @db.Text
+  refreshToken          String?   @db.Text
+  idToken               String?   @db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?   @db.Text
+  password              String?   @db.Text
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime
+  user                  user      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "account_userId_fkey")
+}
+
+model bank {
+  idbank   Int    @id @default(autoincrement())
+  namebank String @unique(map: "namebank") @db.VarChar(20)
+  agency   String @db.VarChar(15)
+  count    String @db.VarChar(15)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+
+model cashflow {
+  idcashflow         Int       @id @default(autoincrement())
+  fk_idcompany       Int?
+  idchartaccounts    Int?
+  fk_idcustomer      Int?
+  customer_phone     String?   @db.VarChar(20)
+  fk_idtypeproduct   Int?
+  fk_idproduct       Int?
+  fk_idbankmaster    Int?
+  fk_idbankclient    Int?
+  fk_idchartaccounts Int?
+  dtcashflow         DateTime? @db.Date
+  tchaflow           DateTime? @db.Time(0)
+  amountflow         Float?
+  valueflow          Float?    @default(0.00)
+  valuewire          Float?    @default(0.00)
+  centsflow          Float?    @default(0.00)
+  cents2flow         Float?    @default(0.00)
+  check_number       String?   @db.VarChar(20)
+  percentflow        Float?    @default(0.00)
+  valuepercentflow   Float?    @default(0.00)
+  airpercentflow     Float?    @default(0.00)
+  aircomisvalue      Float?    @default(0.00)
+  airreservation     String?   @db.Text
+  airdtemiuntil      DateTime? @db.Date
+  totalflow          Float?    @default(0.00)
+  movetype           String?   @db.VarChar(1)
+  totaltopay         Float?    @default(0.00)
+  cashflowok         String?   @default("0") @db.VarChar(1)
+  cashflowobs        String?   @db.TinyText
+  cashfloworigin     Int?
+  wire               String?   @db.Char(3)
+  subtotalflow       Decimal?  @db.Decimal(10, 2)
+  idlogin            String?   @db.VarChar(40)
+  vin                String?   @db.VarChar(40)
+  fk_idcountry       Int?      @db.UnsignedInt
+  fk_idmaker         Int?      @db.UnsignedInt
+  year               String?   @db.Char(4)
+  model              String?   @db.VarChar(20)
+  fk_idcoverage      Int?      @db.UnsignedInt
+  description        String?   @db.VarChar(100)
+  fk_idstatus        Int       @default(0)
+  fk_idstore         Int
+  excluido           Boolean   @default(false)
+
+  @@index([fk_idbankclient], map: "fk_idbank")
+  @@index([fk_idbankmaster], map: "fk_idbankmaster")
+  @@index([fk_idtypeproduct], map: "fk_idproduto")
+  @@index([fk_idtypeproduct], map: "fk_idtypeproduct_idx")
+  @@index([fk_idcustomer], map: "idcustomer")
+}
+
+model chartaccounts {
+  idchartaccounts   Int     @id @default(autoincrement())
+  namechartaccounts String? @db.VarChar(40)
+  io                String? @db.VarChar(1)
+}
+
+model city {
+  idcity    Int     @id @default(autoincrement()) @db.UnsignedInt
+  name_city String? @db.VarChar(40)
+}
+
+model classcustomer {
+  idclasscustomer Int      @id @default(autoincrement())
+  description     String?  @db.VarChar(20)
+  seeincompany    Boolean?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+
+model conta_importada {
+  idconta   Int
+  idempresa Int
+  data      DateTime @db.Date
+  codigo    String   @db.Text
+  tipo      String   @db.VarChar(3)
+  valor     Decimal  @db.Decimal(12, 2)
+  descricao String   @db.Text
+
+  @@ignore
+}
+
+model country {
+  idcountry   Int    @id @default(autoincrement())
+  namecountry String @db.VarChar(20)
+}
+
+model coverage {
+  idcoverage   Int     @id @default(autoincrement())
+  namecoverage String? @db.VarChar(20)
+}
+
+model customer {
+  idcustomer          Int       @id @default(autoincrement())
+  fk_idcity           Int?      @db.UnsignedInt
+  fk_ididentification Int?
+  fk_idcustomer       Int?
+  fk_idclasscustomer  Int?
+  fk_idcountry        Int
+  typecustomer        Int?
+  name                String    @db.VarChar(40)
+  andress             String?   @db.VarChar(100)
+  phone               String?   @db.VarChar(20)
+  phone2              String?   @db.VarChar(20)
+  zipcode             String?   @db.VarChar(20)
+  city                String?   @db.VarChar(40)
+  state               String?   @db.VarChar(40)
+  email               String?   @db.VarChar(100)
+  dtbirth             DateTime? @db.Date
+  numidentification   String?   @db.VarChar(50)
+  comissionpercent    Float?    @default(0.00)
+  attention           String?   @db.Char(250)
+  picture_path        String?   @db.VarChar(200)
+  active              String    @default("0") @db.Char(1)
+  restriction         Boolean?
+  createAt            DateTime  @default(now()) @db.DateTime(0)
+  updateAt            DateTime  @default(now()) @db.DateTime(0)
+
+  @@index([fk_idcity], map: "customer_FKIndex4")
+  @@index([fk_idclasscustomer], map: "fk_idclasscustomer")
+  @@index([fk_idcustomer], map: "fk_idcustomer")
+  @@index([fk_ididentification], map: "fk_ididentification")
+}
+
+model customers {
+  id        Int    @id @default(autoincrement())
+  name      String @db.VarChar(40)
+  email     String @unique(map: "email") @db.VarChar(100)
+  image_url String @unique(map: "image_url") @db.VarChar(100)
+}
+
+model identification {
+  ididentification   Int     @id @default(autoincrement())
+  nameidentification String? @db.VarChar(100)
+}
+
+model imagem {
+  cdpessoa   Int     @id
+  procuracao Boolean @default(false)
+  contrato   String  @default("0") @db.VarChar(1)
+  declaracao String  @default("0") @db.VarChar(1)
+  revogacao  String  @default("0") @db.VarChar(1)
+  cpf        String  @default("0") @db.VarChar(1)
+  rg         String  @default("0") @db.VarChar(1)
+  cnh        String  @default("0") @db.VarChar(1)
+  endereco   String  @default("0") @db.VarChar(1)
+  docextra1  String  @default("0") @db.VarChar(1)
+  docextra2  String  @default("0") @db.VarChar(1)
+  docextra3  String  @default("0") @db.VarChar(1)
+  docextra4  String  @default("0") @db.VarChar(1)
+}
+
+model imagemqtd {
+  cdimg      Int @id @default(autoincrement())
+  procuracao Int @default(0)
+  contrato   Int @default(0)
+  declaracao Int @default(0)
+  revogacao  Int @default(0)
+  cpf        Int @default(0)
+  rg         Int @default(0)
+  cnh        Int @default(0)
+  endereco   Int @default(0)
+  docextra1  Int @default(0)
+  docextra2  Int @default(0)
+  docextra3  Int @default(0)
+  docextra4  Int @default(0)
+}
+
+model invoices {
+  customer_id Int
+  amount      Decimal  @db.Decimal(10, 2)
+  status      String   @db.VarChar(20)
+  date        DateTime @db.Date
+  id          Int      @id @default(autoincrement())
+}
+
+model licensecountry {
+  idlicense   Int     @id @default(autoincrement())
+  namelicense String? @db.VarChar(40)
+}
+
+model login {
+  idlogin  Int     @id @default(autoincrement()) @db.UnsignedInt
+  login    String  @unique(map: "login") @db.VarChar(40)
+  senha    String? @db.VarChar(80)
+  nome     String? @db.VarChar(40)
+  celular  String  @db.VarChar(15)
+  email    String? @unique(map: "email") @db.VarChar(40)
+  perfil   String? @db.Char(1)
+  active   String? @db.Char(1)
+  token    String  @db.VarChar(200)
+  excluido Int     @default(0) @db.TinyInt
+}
+
+model maker {
+  idmaker   Int    @id @default(autoincrement())
+  namemaker String @db.VarChar(30)
+}
+
+model menu_options {
+  idmenu_options   Int     @id @default(autoincrement()) @db.UnsignedInt
+  menu             String? @db.VarChar(40)
+  menu_description String? @db.VarChar(40)
+  path             String? @db.VarChar(80)
+  sub_menu         String? @db.VarChar(40)
+  seq              Int?    @db.UnsignedInt
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+
+model parameters {
+  id_parameter       Int      @id @db.UnsignedInt
+  client             String?  @db.VarChar(80)
+  exchange_vl_month  Decimal? @db.Decimal(12, 2)
+  exchange_vl_year   Decimal? @db.Decimal(12, 2)
+  exchange_vl_wire   Decimal? @db.Decimal(12, 2)
+  exchange_comission Decimal? @db.Decimal(12, 2)
+  fk_idclient        Int?
+}
+
+model percentcheck {
+  idpercentcheck  Int    @id @default(autoincrement())
+  formula         String @db.VarChar(100)
+  valuereturn     Float
+  valuereturntype String @db.VarChar(1)
+}
+
+model pessoa {
+  cdpessoa      Int      @id @default(autoincrement())
+  nome          String   @db.VarChar(200)
+  nacionalidade String?  @db.VarChar(20)
+  profissao     String?  @db.VarChar(100)
+  estado_civil  String?  @db.VarChar(20)
+  rg            String?  @db.VarChar(20)
+  cpf           String   @unique(map: "cpf") @db.VarChar(40)
+  endereco      String?  @db.VarChar(200)
+  bairro        String?  @db.VarChar(20)
+  municipio     String?  @db.VarChar(40)
+  uf            String?  @db.VarChar(2)
+  cep           String?  @db.VarChar(10)
+  telefone      String?  @db.VarChar(40)
+  docespecial   String?  @db.VarChar(20)
+  excluido      Int?
+  idlogin       Int
+  idloginalt    Int
+  idlogindel    Int
+  dtcad         DateTime @db.Date
+  ok            Boolean  @default(false)
+  dtalt         DateTime @db.Date
+  dtdel         DateTime @db.Date
+  apelido       String   @db.VarChar(50)
+  geoloc        String   @db.VarChar(50)
+}
+
+model product {
+  idproduct        Int     @id @default(autoincrement())
+  fk_idtypeproduct Int?
+  nameproduct      String? @db.VarChar(50)
+  amountproduct    Float?
+  productvalue     Float   @default(0.00)
+  percentcomis     Float   @default(0.00)
+  percentchq       Float   @default(0.00)
+  rule             Int     @default(3)
+  movetype         String? @db.VarChar(1)
+
+  @@index([fk_idtypeproduct], map: "fk_idtypeproduct")
+}
+
+model revenue {
+  month   String @unique(map: "month") @db.VarChar(3)
+  revenue Int
+}
+
+model rule {
+  idlogin          Int      @id @db.UnsignedInt
+  Exchange         Boolean  @default(false)
+  City             Boolean? @default(false)
+  Bank             Boolean  @default(false)
+  Overwiew         Boolean  @default(false)
+  Monthly_Overview Boolean  @default(false) @map("Monthly Overview")
+  Class_Customer   Boolean  @default(false) @map("Class Customer")
+  Customer         Boolean  @default(false)
+  Identification   Boolean  @default(false)
+  User             Boolean  @default(false)
+  Report           Int      @default(0) @db.TinyInt
+}
+
+model session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  ipAddress String?  @db.Text
+  userAgent String?  @db.Text
+  userId    String
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "session_userId_fkey")
+}
+
+model sessions {
+  id            String  @id @db.VarChar(255)
+  user_id       String? @db.VarChar(255)
+  ip_address    String? @db.VarChar(45)
+  user_agent    String? @db.Text
+  payload       String? @db.LongText
+  last_activity Int?    @default(0) @db.UnsignedInt
+
+  @@index([last_activity], map: "sessions_last_activity_index")
+  @@index([user_id], map: "sessions_user_id_index")
+}
+
+model status {
+  idstatus    Int     @id @unique(map: "idstatus") @default(autoincrement())
+  description String  @unique(map: "description") @db.VarChar(20)
+  emphasis    Boolean @default(false)
+}
+
+model store {
+  idstore Int    @id @default(autoincrement())
+  nmstore String @db.VarChar(100)
+  nmbd    String @db.VarChar(10)
+  ipstore String @db.VarChar(11)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+
+model storeip {
+  idstore Int
+  ipstore String @db.VarChar(100)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+
+model teste {
+  hora DateTime @db.Time(0)
+
+  @@ignore
+}
+
+model typeproduct {
+  idtypeproduct   Int     @id
+  nametypeproduct String? @db.VarChar(50)
+}
+
+model user {
+  id            String    @id
+  name          String    @db.Text
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?   @db.Text
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now())
+  account       account[]
+  session       session[]
+}
+
+model users {
+  id       Int    @id @default(autoincrement())
+  name     String @db.VarChar(40)
+  email    String @unique(map: "email") @db.VarChar(100)
+  password String @db.VarChar(60)
+  celular  String @db.VarChar(15)
+}
+
+model verification {
+  id         String   @id
+  identifier String   @db.Text
+  value      String   @db.Text
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+}
+
+model wiredetail {
+  wire_id       Int    @id @default(autoincrement())
+  fk_idcashflow Int?
+  fk_idcountry  Int?
+  qtdwire       Float?
 }

@@ -41,7 +41,7 @@ export function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
     { href: "/overview", label: "Overview", icon: <Home size={18} /> },
     { href: "/dashboard/dsmonth", label: "Monthly Overview", icon: <BarChart3 size={18} /> },
     { href: "/exchange", label: "Exchange", icon: <RefreshCcw size={18} /> },
-    { href: "/dashboard", label: "Bank", icon: <Banknote size={18} /> },
+    { href: "/bank", label: "Bank", icon: <Banknote size={18} /> },
     { href: "/city", label: "City", icon: <Building size={18} /> },
     { href: "/class-customer", label: "Class Customer", icon: <Users size={18} /> },
     { href: "/customer", label: "Customer", icon: <User size={18} /> },

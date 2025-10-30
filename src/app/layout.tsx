@@ -2,6 +2,7 @@ import "./globals.css";
 import { Metadata } from "next";
 import { ClientLayout } from "./client-layout"; // novo arquivo
 
+
 export const metadata: Metadata = {
   title: ".:Luna Travel:.",
   description: "Aprendendo Next Js do Zero com Sujeito Programador.",

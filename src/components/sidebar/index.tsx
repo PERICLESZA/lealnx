@@ -43,7 +43,7 @@ export function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
     { href: "/exchange", label: "Exchange", icon: <RefreshCcw size={18} /> },
     { href: "/bank", label: "Bank", icon: <Banknote size={18} /> },
     { href: "/city", label: "City", icon: <Building size={18} /> },
-    { href: "/class-customer", label: "Class Customer", icon: <Users size={18} /> },
+    { href: "/classcustomer", label: "Class Customer", icon: <Users size={18} /> },
     { href: "/customer", label: "Customer", icon: <User size={18} /> },
     { href: "/identification", label: "Identification", icon: <User size={18} /> },
     { href: "/user", label: "User", icon: <User size={18} /> },

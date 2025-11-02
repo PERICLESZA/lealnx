@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast, Toaster } from "sonner";
-import { authClient } from "@/lib/auth-client"; // ✅ usa o seu arquivo lib/auth-client.ts
+import { authClient } from "@/lib/auth-client";
 
 interface City {
   idcity: number;
@@ -14,11 +14,10 @@ export default function CityPage() {
   const router = useRouter();
   const [cities, setCities] = useState<City[]>([]);
   const [newCity, setNewCity] = useState("");
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingCity, setEditingCity] = useState<City | null>(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
 
-  // 🔒 Verifica se o usuário está logado antes de carregar os dados
   useEffect(() => {
     async function checkAuth() {
       try {
@@ -27,8 +26,8 @@ export default function CityPage() {
           router.push("/");
           return;
         }
-        setUser(session.user); // salva o usuário no state
-        await loadCities();    // carrega as cidades
+        setUser(session.user);
+        await loadCities();
       } catch (err) {
         console.error("Auth error:", err);
         router.push("/");
@@ -36,12 +35,9 @@ export default function CityPage() {
         setLoading(false);
       }
     }
-
     checkAuth();
   }, [router]);
 
-   console.log
-  // 🔹 Função para carregar cidades
   async function loadCities() {
     const res = await fetch("/api/city");
     const data = await res.json();
@@ -50,33 +46,30 @@ export default function CityPage() {
 
   async function addCity() {
     if (!newCity.trim()) return;
-
     await fetch("/api/city", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name_city: newCity }),
     });
-
-    toast.success("Included successfully!");
+    toast.success("City added successfully!");
     setNewCity("");
     loadCities();
   }
 
-  async function updateCity(idcity: number, name_city: string) {
+  async function saveCity() {
+    if (!editingCity) return;
     await fetch("/api/city", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ idcity, name_city }),
+      body: JSON.stringify(editingCity),
     });
     toast.success("City updated successfully!");
+    setEditingCity(null);
     loadCities();
-    setEditingId(null);
   }
 
   async function deleteCity(idcity: number) {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this city?"
-    );
+    const confirmDelete = window.confirm("Are you sure you want to delete this city?");
     if (!confirmDelete) return;
 
     await fetch("/api/city", {
@@ -84,21 +77,14 @@ export default function CityPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ idcity }),
     });
-
     toast.info("City deleted successfully!");
     loadCities();
   }
 
-  if (loading) {
-    return null;
-  }
+  if (loading || !user) return null;
 
-  if (!user) {
-    return null; // usuário não logado, nada renderiza
-  } 
-
-  return user ? (
-    <div className="p-6 bg-gray-50 rounded-xl shadow-md">
+  return (
+    <div className="p-6 bg-gray-50 rounded-xl shadow-md overflow-x-auto">
       <Toaster richColors position="top-right" />
 
       <div className="flex justify-between items-center mb-4">
@@ -114,7 +100,7 @@ export default function CityPage() {
       <div className="mb-4 flex gap-2">
         <input
           type="text"
-          placeholder="TYPE THE CITY NAME"
+          placeholder="Type the city name"
           value={newCity}
           onChange={(e) => setNewCity(e.target.value)}
           className="border rounded px-3 py-2 flex-1"
@@ -140,20 +126,43 @@ export default function CityPage() {
           {cities.map((c) => (
             <tr key={c.idcity}>
               <td className="border text-center">
-                <button
-                  onClick={() => setEditingId(c.idcity)}
-                  className="text-orange-600"
-                >
-                  ✏️
-                </button>
+                {editingCity?.idcity === c.idcity ? (
+                  <>
+                    <button
+                      onClick={saveCity}
+                      className="text-green-600 font-bold mr-2"
+                      title="Save"
+                    >
+                      💾
+                    </button>
+                    <button
+                      onClick={() => setEditingCity(null)}
+                      className="text-gray-600"
+                      title="Cancel"
+                    >
+                      ✖️
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => setEditingCity({ ...c })}
+                    className="text-orange-600"
+                  >
+                    ✏️
+                  </button>
+                )}
               </td>
-              <td className="border px-2 py-1 text-center">{c.idcity}</td>
-              <td className="border px-2 py-1 text-center">
-                {editingId === c.idcity ? (
+
+              <td className="border text-center">{c.idcity}</td>
+
+              <td className="border text-center">
+                {editingCity?.idcity === c.idcity ? (
                   <input
                     type="text"
-                    defaultValue={c.name_city ?? ""}
-                    onBlur={(e) => updateCity(c.idcity, e.target.value)}
+                    value={editingCity.name_city ?? ""}
+                    onChange={(e) =>
+                      setEditingCity({ ...editingCity, name_city: e.target.value })
+                    }
                     className="border rounded px-2 py-1 w-full"
                     autoFocus
                   />
@@ -161,6 +170,7 @@ export default function CityPage() {
                   c.name_city
                 )}
               </td>
+
               <td className="border text-center">
                 <button
                   onClick={() => deleteCity(c.idcity)}
@@ -174,5 +184,5 @@ export default function CityPage() {
         </tbody>
       </table>
     </div>
-  ): null;
+  );
 }
